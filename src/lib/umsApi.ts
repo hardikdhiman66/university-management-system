@@ -75,8 +75,7 @@ async function ensureAcademicContext() {
       .insert({
         label: "2026-27",
         starts_on: "2026-07-01",
-        ends_on: "2027-06-30",
-        is_current: true,
+        ends_on: "2027-06-30"
       })
       .select("id")
       .single();
@@ -92,19 +91,22 @@ async function ensureAcademicContext() {
     .maybeSingle();
 
   if (!semester) {
-    const { data: newSem, error } = await supabase
-      .from("semesters")
-      .insert({
-        academic_year_id: year.id,
-        name: "Semester 1",
-        number: 1,
-        starts_on: "2026-07-01",
-        ends_on: "2026-12-15",
-        is_current: true,
-      })
+    let { data: ays } = await supabase.from("academic_years").select("id").limit(1);
+    let ayId = ays?.[0]?.id;
+    if (!ayId) {
+      const { data: newAy, error: ayErr } = await supabase
+        .from("academic_years")
+        .insert({ name: "2026-2027" })
+        .select("id")
+        .single();
+      if (ayErr) throw ayErr;
+      ayId = newAy.id;
+    }
+    const { data: newSem, error: semErr } = await supabase
+      .from("semesters").insert({ academic_year_id: ayId, name: "Semester 1", sequence_no: 1, starts_on: "2026-07-01", ends_on: "2026-12-31" })
       .select("id")
       .single();
-    if (error) throw error;
+    if (semErr) throw semErr;
     semester = newSem;
   }
 
@@ -327,7 +329,7 @@ export async function createExaminationRecord(input: {
     .insert({
       course_offering_id: offeringId,
       title: input.title,
-      exam_type: input.exam_type,
+      exam_type: ((t: string) => { const s = String(t || "").toLowerCase(); if (s.includes("mid")) return "midterm"; if (s.includes("end") || s.includes("final")) return "final"; if (s.includes("quiz")) return "quiz"; if (s.includes("prac") || s.includes("lab")) return "practical"; return "midterm"; })(input.exam_type.toLowerCase().replace(/[-\s]+/g), "_"),
       maximum_marks: input.maximum_marks,
       held_on: input.held_on || null,
       is_published: true,
@@ -361,15 +363,13 @@ export async function createStudentFeeRecord(input: {
   const { academicYearId } = await ensureAcademicContext();
 
   const { data: structure, error: structErr } = await supabase
-    .from("fee_structures")
-    .insert({
+    .from("fee_structures").upsert({
       academic_year_id: academicYearId,
       program_id: student.program_id,
       name: input.fee_name,
       amount: input.billed_amount,
       due_on: input.due_on,
-    })
-    .select("id")
+    }, { onConflict: "program_id,academic_year_id,name" }).select("id")
     .single();
   if (structErr) throw structErr;
 

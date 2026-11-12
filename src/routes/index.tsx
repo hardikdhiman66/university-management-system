@@ -742,23 +742,23 @@ function Index() {
                 }}
                 className="grid gap-4 rounded-2xl border border-slate-200/80 bg-white/95 p-6 shadow-sm backdrop-blur-xs sm:grid-cols-4"
               >
-                <input
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Employee No</label><input
                   type="text"
                   placeholder="Employee No (e.g. EMP101)"
                   value={empNo}
                   onChange={(e) => setEmpNo(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:outline-none"
                   required
-                />
-                <input
+                /></div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Designation</label><input
                   type="text"
                   placeholder="Designation (e.g. Professor)"
                   value={designation}
                   onChange={(e) => setDesignation(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:outline-none"
                   required
-                />
-                <select
+                /></div>
+                <div className="flex flex-col gap-1.5 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Department</label><select
                   value={facultyDeptId}
                   onChange={(e) => setFacultyDeptId(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:outline-none"
@@ -769,7 +769,7 @@ function Index() {
                       {d.code} - {d.name}
                     </option>
                   ))}
-                </select>
+                </select></div>
                 <button
                   type="submit"
                   disabled={saving}
@@ -839,23 +839,23 @@ function Index() {
                 }}
                 className="grid gap-4 rounded-2xl border border-slate-200/80 bg-white/95 p-6 shadow-sm backdrop-blur-xs sm:grid-cols-5"
               >
-                <input
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Code</label><input
                   type="text"
                   placeholder="Code (e.g. 25CST-201)"
                   value={courseCode}
                   onChange={(e) => setCourseCode(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:outline-none"
                   required
-                />
-                <input
+                /></div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Course Title</label><input
                   type="text"
                   placeholder="Course Title"
                   value={courseTitle}
                   onChange={(e) => setCourseTitle(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:outline-none sm:col-span-2"
                   required
-                />
-                <input
+                /></div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Status</label><input
                   type="number"
                   min={1}
                   max={10}
@@ -863,8 +863,8 @@ function Index() {
                   onChange={(e) => setCourseCredits(Number(e.target.value))}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:outline-none"
                   required
-                />
-                <select
+                /></div>
+                <div className="flex flex-col gap-1.5 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Department</label><select
                   value={courseDeptId}
                   onChange={(e) => setCourseDeptId(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:outline-none"
@@ -875,7 +875,7 @@ function Index() {
                       {d.code}
                     </option>
                   ))}
-                </select>
+                </select></div>
                 <button
                   type="submit"
                   disabled={saving}
@@ -947,7 +947,7 @@ function Index() {
                 }}
                 className="grid gap-4 rounded-2xl border border-slate-200/80 bg-white/95 p-6 shadow-sm backdrop-blur-xs sm:grid-cols-5"
               >
-                <select
+                <div className="flex flex-col gap-1.5 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Student</label><select
                   value={attStudentId}
                   onChange={(e) => setAttStudentId(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
@@ -959,8 +959,8 @@ function Index() {
                       {s.registration_no} - {s.first_name}
                     </option>
                   ))}
-                </select>
-                <select
+                </select></div>
+                <div className="flex flex-col gap-1.5 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Course</label><select
                   value={attCourseId}
                   onChange={(e) => setAttCourseId(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
@@ -972,15 +972,15 @@ function Index() {
                       {c.code} - {c.title}
                     </option>
                   ))}
-                </select>
-                <input
+                </select></div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Date</label><input
                   type="date"
                   value={attDate}
                   onChange={(e) => setAttDate(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
                   required
-                />
-                <select
+                /></div>
+                <div className="flex flex-col gap-1.5 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Status</label><select
                   value={attStatus}
                   onChange={(e) => setAttStatus(e.target.value as any)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
@@ -989,7 +989,7 @@ function Index() {
                   <option value="absent">Absent</option>
                   <option value="late">Late</option>
                   <option value="excused">Excused</option>
-                </select>
+                </select></div>
                 <button
                   type="submit"
                   disabled={saving}
@@ -1066,7 +1066,7 @@ function Index() {
                 }}
                 className="grid gap-4 rounded-2xl border border-slate-200/80 bg-white/95 p-6 shadow-sm backdrop-blur-xs sm:grid-cols-5"
               >
-                <select
+                <div className="flex flex-col gap-1.5 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Course</label><select
                   value={examCourseId}
                   onChange={(e) => setExamCourseId(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
@@ -1077,16 +1077,16 @@ function Index() {
                       {c.code} - {c.title}
                     </option>
                   ))}
-                </select>
-                <input
+                </select></div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Exam Title</label><input
                   type="text"
                   placeholder="Exam Title (e.g. MST-1)"
                   value={examTitle}
                   onChange={(e) => setExamTitle(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
                   required
-                />
-                <select
+                /></div>
+                <div className="flex flex-col gap-1.5 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Status</label><select
                   value={examType}
                   onChange={(e) => setExamType(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
@@ -1095,8 +1095,8 @@ function Index() {
                   <option value="End-Term">End-Term</option>
                   <option value="Practical">Practical</option>
                   <option value="Quiz">Quiz</option>
-                </select>
-                <input
+                </select></div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Status</label><input
                   type="number"
                   min={10}
                   max={500}
@@ -1104,7 +1104,7 @@ function Index() {
                   onChange={(e) => setExamMaxMarks(Number(e.target.value))}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
                   required
-                />
+                /></div>
                 <button
                   type="submit"
                   disabled={saving}
@@ -1177,7 +1177,7 @@ function Index() {
                 }}
                 className="grid gap-4 rounded-2xl border border-slate-200/80 bg-white/95 p-6 shadow-sm backdrop-blur-xs sm:grid-cols-5"
               >
-                <select
+                <div className="flex flex-col gap-1.5 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Student</label><select
                   value={feeStudentId}
                   onChange={(e) => setFeeStudentId(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
@@ -1188,31 +1188,31 @@ function Index() {
                       {s.registration_no} - {s.first_name}
                     </option>
                   ))}
-                </select>
-                <input
+                </select></div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Fee Title</label><input
                   type="text"
                   placeholder="Fee Title"
                   value={feeName}
                   onChange={(e) => setFeeName(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
                   required
-                />
-                <input
+                /></div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Billed ₹</label><input
                   type="number"
                   placeholder="Billed ₹"
                   value={feeBilled}
                   onChange={(e) => setFeeBilled(Number(e.target.value))}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
                   required
-                />
-                <input
+                /></div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Paid ₹</label><input
                   type="number"
                   placeholder="Paid ₹"
                   value={feePaid}
                   onChange={(e) => setFeePaid(Number(e.target.value))}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
                   required
-                />
+                /></div>
                 <button
                   type="submit"
                   disabled={saving}
@@ -1305,38 +1305,38 @@ function Index() {
                 }}
                 className="grid gap-4 rounded-2xl border border-slate-200/80 bg-white/95 p-6 shadow-sm backdrop-blur-xs sm:grid-cols-5"
               >
-                <input
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">ISBN</label><input
                   type="text"
                   placeholder="ISBN (e.g. 978-0134685991)"
                   value={bookIsbn}
                   onChange={(e) => setBookIsbn(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
                   required
-                />
-                <input
+                /></div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Book Title</label><input
                   type="text"
                   placeholder="Book Title"
                   value={bookTitle}
                   onChange={(e) => setBookTitle(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
                   required
-                />
-                <input
+                /></div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Author</label><input
                   type="text"
                   placeholder="Author"
                   value={bookAuthor}
                   onChange={(e) => setBookAuthor(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
                   required
-                />
-                <input
+                /></div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1"><label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Status</label><input
                   type="number"
                   min={1}
                   value={bookCopies}
                   onChange={(e) => setBookCopies(Number(e.target.value))}
                   className="rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm"
                   required
-                />
+                /></div>
                 <button
                   type="submit"
                   disabled={saving}
