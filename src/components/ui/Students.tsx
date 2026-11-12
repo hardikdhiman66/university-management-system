@@ -1,279 +1,288 @@
-import { useMemo, useState } from "react";
-import { Search, Plus, X } from "lucide-react";
-
-type Student = {
-  id: string;
-  name: string;
-  email: string;
-  department: string;
-  year: string;
-  status: "Active" | "Inactive";
-};
-
-const initialStudents: Student[] = [
-  {
-    id: "UNI001",
-    name: "Aarav Sharma",
-    email: "aarav@example.com",
-    department: "Computer Science",
-    year: "2nd Year",
-    status: "Active",
-  },
-  {
-    id: "UNI002",
-    name: "Priya Verma",
-    email: "priya@example.com",
-    department: "Business",
-    year: "1st Year",
-    status: "Active",
-  },
-  {
-    id: "UNI003",
-    name: "Kabir Singh",
-    email: "kabir@example.com",
-    department: "Engineering",
-    year: "3rd Year",
-    status: "Inactive",
-  },
-];
+import { useEffect, useMemo, useState } from "react";
+import { Search, Plus, X, Trash2, Sparkles, Users, GraduationCap } from "lucide-react";
+import {
+  fetchDashboardData,
+  createStudentRecord,
+  deleteStudentRecord,
+} from "../../lib/umsApi";
 
 export default function Students() {
-  const [students, setStudents] = useState<Student[]>(initialStudents);
+  const [students, setStudents] = useState<any[]>([]);
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  function showToast(msg: string) {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3000);
+  }
+
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
 
-  const [name, setName] = useState("");
+  const [regNo, setRegNo] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [department, setDepartment] = useState("Computer Science");
-  const [year, setYear] = useState("1st Year");
+  const [departmentId, setDepartmentId] = useState("");
+
+  async function loadStudents() {
+    try {
+      setLoading(true);
+      setErrorMsg(null);
+      const data = await fetchDashboardData();
+      setStudents(data.students);
+      setDepartments(data.departments);
+      if (!departmentId && data.departments.length > 0) {
+        setDepartmentId(data.departments[0].id);
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message ?? "Failed to load students");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadStudents();
+  }, []);
 
   const filteredStudents = useMemo(() => {
     const term = search.toLowerCase();
-
-    return students.filter((student) =>
+    return students.filter((s) =>
       [
-        student.id,
-        student.name,
-        student.email,
-        student.department,
-        student.year,
-      ].some((value) => value.toLowerCase().includes(term))
+        s.registration_no,
+        s.first_name,
+        s.last_name,
+        s.email ?? "",
+        s.programs?.departments?.name ?? "",
+      ].some((v) => String(v).toLowerCase().includes(term))
     );
   }, [students, search]);
 
-  function addStudent(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function handleAddStudent(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!departmentId) {
+      setErrorMsg("Please create a Department first before adding a student.");
+      return;
+    }
+    try {
+      setSaving(true);
+      setErrorMsg(null);
+      await createStudentRecord({
+        registration_no: regNo.trim().toUpperCase(),
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        email: email.trim(),
+        department_id: departmentId,
+      });
+      setRegNo("");
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setShowForm(false);
+      await loadStudents();
+      showToast("Student added successfully");
+    } catch (err: any) {
+      setErrorMsg(err?.message ?? "Could not add student");
+    } finally {
+      setSaving(false);
+    }
+  }
 
-    const newStudent: Student = {
-      id: `UNI${String(students.length + 1).padStart(3, "0")}`,
-      name: name.trim(),
-      email: email.trim(),
-      department,
-      year,
-      status: "Active",
-    };
-
-    setStudents((current) => [...current, newStudent]);
-    setName("");
-    setEmail("");
-    setDepartment("Computer Science");
-    setYear("1st Year");
-    setShowForm(false);
+  async function handleDelete(id: string) {
+    try {
+      await deleteStudentRecord(id);
+      await loadStudents();
+      showToast("Student deleted successfully");
+    } catch (err: any) {
+      setErrorMsg(err?.message ?? "Could not delete student");
+    }
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Students</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Manage student records and information.
-          </p>
+      {toastMsg && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-xl">
+          <span className="h-2 w-2 rounded-full bg-white" />
+          {toastMsg}
         </div>
+      )}
+      {/* Creative Module Banner with Quote */}
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-r from-white via-slate-50 to-slate-100/80 p-6 text-slate-900 shadow-xs">
+        <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-blue-500/20 blur-2xl" />
+        <div className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 rounded-full bg-indigo-400/15 blur-2xl" />
+        <div className="relative flex flex-wrap items-center justify-between gap-4">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600 backdrop-blur-xs">
+              <Sparkles size={13} /> Student Directory & Enrollment
+            </div>
+            <h2 className="mt-3 text-2xl font-bold tracking-tight">Student Records Portal</h2>
+            <p className="mt-1.5 text-sm italic text-slate-500">
+              “Education is the most powerful weapon which you can use to change the world.” — Nelson Mandela
+            </p>
+          </div>
+          <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 backdrop-blur-xs">
+            <Users className="text-slate-700" size={22} />
+            <div>
+              <p className="text-[11px] uppercase tracking-wider text-slate-400">Enrolled</p>
+              <p className="text-xl font-bold">{students.length}</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      {errorMsg && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {errorMsg}
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-xs">
+        <div className="relative min-w-[240px] flex-1">
+          <Search size={16} className="absolute left-3.5 top-3 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search by Reg ID, name, email, department..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-slate-50/60 py-2.5 pl-10 pr-3 text-sm transition focus:border-blue-500 focus:bg-white focus:outline-none"
+          />
+        </div>
         <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
         >
-          <Plus size={18} />
-          Add Student
+          {showForm ? <X size={16} /> : <Plus size={16} />}
+          {showForm ? "Close Form" : "Add New Student"}
         </button>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="relative mb-5 max-w-sm">
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+      {showForm && (
+        <form
+          onSubmit={handleAddStudent}
+          className="grid gap-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:grid-cols-2 lg:grid-cols-5"
+        >
+          <input
+            type="text"
+            placeholder="Reg No (e.g. 25BCS101)"
+            value={regNo}
+            onChange={(e) => setRegNo(e.target.value)}
+            className="rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
+            required
           />
           <input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search students..."
-            className="w-full rounded-lg border border-slate-200 py-2.5 pl-10 pr-3 text-sm outline-none focus:border-blue-500"
+            type="text"
+            placeholder="First Name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            className="rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
+            required
           />
-        </div>
+          <input
+            type="text"
+            placeholder="Last Name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            className="rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
+          />
+          <select
+            value={departmentId}
+            onChange={(e) => setDepartmentId(e.target.value)}
+            className="rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
+            required
+          >
+            {departments.length === 0 && <option value="">No departments found</option>}
+            {departments.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.code} - {d.name}
+              </option>
+            ))}
+          </select>
+          <button
+            type="submit"
+            disabled={saving}
+            className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 disabled:opacity-50 sm:col-span-2 lg:col-span-5"
+          >
+            {saving ? "Saving Student..." : "Save Student to Database"}
+          </button>
+        </form>
+      )}
 
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm backdrop-blur-xs">
+        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+          <h3 className="font-bold text-slate-900">Registered Students ({filteredStudents.length})</h3>
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-900">Live Sync</span>
+        </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[650px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 text-slate-500">
-                <th className="px-3 py-3 font-medium">Student ID</th>
-                <th className="px-3 py-3 font-medium">Name</th>
-                <th className="px-3 py-3 font-medium">Email</th>
-                <th className="px-3 py-3 font-medium">Department</th>
-                <th className="px-3 py-3 font-medium">Year</th>
-                <th className="px-3 py-3 font-medium">Status</th>
+          <table className="w-full text-left text-sm">
+            <thead className="bg-slate-50/80 text-xs uppercase text-slate-500">
+              <tr>
+                <th className="px-6 py-3.5">Student</th>
+                <th className="px-6 py-3.5">Reg ID</th>
+                <th className="px-6 py-3.5">Email</th>
+                <th className="px-6 py-3.5">Department</th>
+                <th className="px-6 py-3.5">Status</th>
+                <th className="px-6 py-3.5 text-right">Action</th>
               </tr>
             </thead>
-
             <tbody>
-              {filteredStudents.map((student) => (
-                <tr
-                  key={student.id}
-                  className="border-b border-slate-100 last:border-0"
-                >
-                  <td className="px-3 py-4 font-medium text-slate-700">
-                    {student.id}
-                  </td>
-                  <td className="px-3 py-4 font-medium text-slate-900">
-                    {student.name}
-                  </td>
-                  <td className="px-3 py-4 text-slate-600">
-                    {student.email}
-                  </td>
-                  <td className="px-3 py-4 text-slate-600">
-                    {student.department}
-                  </td>
-                  <td className="px-3 py-4 text-slate-600">{student.year}</td>
-                  <td className="px-3 py-4">
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                        student.status === "Active"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-slate-100 text-slate-600"
-                      }`}
-                    >
-                      {student.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-
-              {filteredStudents.length === 0 && (
+              {filteredStudents.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-3 py-8 text-center text-slate-500">
-                    No students found.
+                  <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
+                    <GraduationCap size={32} className="mx-auto mb-2 text-slate-300" />
+                    {loading ? "Loading students..." : "No students found. Click Add New Student above!"}
                   </td>
                 </tr>
+              ) : (
+                filteredStudents.map((s) => {
+                  const initials = `${s.first_name?.[0] ?? ""}${s.last_name?.[0] ?? ""}`.toUpperCase();
+                  return (
+                    <tr key={s.id} className="border-t border-slate-100 transition hover:bg-blue-50/30">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white shadow-2xs">
+                            {initials || "ST"}
+                          </div>
+                          <span className="font-semibold text-slate-900">
+                            {s.first_name} {s.last_name}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-blue-600">{s.registration_no}</td>
+                      <td className="px-6 py-4 text-slate-500">{s.email || "—"}</td>
+                      <td className="px-6 py-4 text-slate-600">{s.programs?.departments?.name || "—"}</td>
+                      <td className="px-6 py-4">
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold capitalize text-slate-900">
+                          {s.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          onClick={() => handleDelete(s.id)}
+                          className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50"
+                        >
+                          <Trash2 size={14} /> Delete
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
-
-        <p className="mt-4 text-xs text-slate-500">
-          Showing {filteredStudents.length} of {students.length} students
-        </p>
       </div>
-
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <form
-            onSubmit={addStudent}
-            className="w-full max-w-md space-y-4 rounded-xl bg-white p-6 shadow-xl"
-          >
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">
-                Add New Student
-              </h2>
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
-                aria-label="Close form"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Full name
-              </label>
-              <input
-                required
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-blue-500"
-                placeholder="Enter student name"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Email
-              </label>
-              <input
-                required
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-blue-500"
-                placeholder="student@example.com"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Department
-              </label>
-              <select
-                value={department}
-                onChange={(event) => setDepartment(event.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm"
-              >
-                <option>Computer Science</option>
-                <option>Engineering</option>
-                <option>Business</option>
-                <option>Mathematics</option>
-                <option>Arts</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Academic year
-              </label>
-              <select
-                value={year}
-                onChange={(event) => setYear(event.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm"
-              >
-                <option>1st Year</option>
-                <option>2nd Year</option>
-                <option>3rd Year</option>
-                <option>4th Year</option>
-              </select>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-              >
-                Save Student
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
     </div>
   );
 }
