@@ -1,5 +1,4 @@
--- UniSphere phase 1 schema. Apply to a fresh Lovable Cloud PostgreSQL project.
--- This file is synchronized with the hosted migration; seed data is in 02_sample_data_views.sql.
+--UniSphere University Management System Schema
 
 CREATE TYPE public.app_role AS ENUM ('admin', 'faculty', 'student', 'accountant', 'librarian');
 CREATE TYPE public.attendance_status AS ENUM ('present', 'absent', 'late', 'excused');
